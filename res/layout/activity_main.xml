@@ -1,20 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/FrameLayout01"
+    android:id="@+id/myFrameLayout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
-
+    
     <SurfaceView
-        android:id="@+id/SurfaceView01"
+        android:id="@+id/mySurfaceView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
     </SurfaceView>
+    
 
+    <ImageView
+        android:id="@+id/ringImageOverlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    
     <Button
-        android:id="@+id/Button01"
+        android:id="@+id/shotButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@+id/Button01" >
+        android:layout_gravity="right|center"
+        android:layout_marginRight="15dp"
+        android:text="Shot" >
+
     </Button>
+    
 
 </FrameLayout>
