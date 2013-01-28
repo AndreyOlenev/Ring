@@ -1,4 +1,5 @@
 package com.aolenev.ring;
+
 /**
  * 1. open camera
  * 2. overlay outline of hand on camera view. This is what instructs the user on where to place their hand.
@@ -6,6 +7,9 @@ package com.aolenev.ring;
  * 4. Displays the photo just taken with a static ring image on top.
  * 5. Allows the user to tap "Save" and save the image to their photo library.
  */
+
+//x: 125
+//y: 255
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,7 +24,6 @@ import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.SurfaceHolder;
@@ -29,22 +32,20 @@ import android.view.WindowManager;
 import android.view.SurfaceView;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.FrameLayout;
 
 public class MainActivity extends Activity implements SurfaceHolder.Callback, View.OnClickListener, Camera.PictureCallback, Camera.PreviewCallback, Camera.AutoFocusCallback {
 	private Camera		camera;
 	private SurfaceHolder	surfaceHolder;
 	private SurfaceView	preview;
 	private Button		shotBtn;
-	private ImageView	ringImageOverlay;
-	public static float	scale;
+	public static String		screenSize;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		// Portret orientation
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		// Full Screen
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -57,45 +58,42 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
 		surfaceHolder = preview.getHolder();
 		surfaceHolder.addCallback(this);
-		surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+		//surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		
 
 		shotBtn = (Button) findViewById(R.id.shotButton);
 		//shotBtn.setText("Shot");
 		shotBtn.setOnClickListener(this);
 		
-		ringImageOverlay = (ImageView) findViewById(R.id.ringImageOverlay);
-		final Drawable ringImage = getResources().getDrawable(R.drawable.face_circle_tiled2);
-		ringImageOverlay.post(new Runnable() {
-			
-			@Override
-			public void run() {
-				ringImageOverlay.setImageDrawable(ringImage);
-			}
-		});
+		ImageView handOverlay = (ImageView) findViewById(R.id.handOverlay);
+		final Drawable handImage = getResources().getDrawable(R.drawable.hand1);
+		handOverlay.setImageDrawable(handImage);
 
-		FrameLayout myLayout = (FrameLayout) findViewById(R.id.myFrameLayout);
-		myLayout.setOnTouchListener(new PanAndZoomListener(ringImageOverlay));	
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 		
-		int width = dm.heightPixels * 4 / 3;
-		int height = dm.heightPixels;
-		scale = (float)width / 800;
+		//Log.e("start res", "w: " + dm.widthPixels + " h: " + dm.heightPixels);
 		
-		Log.e("res", "w: " + width + " h: " + height);
+		int width = dm.widthPixels;
+		int height = dm.widthPixels * 4 / 3;
+		
+		if (dm.widthPixels == 480){
+			screenSize = "hdpi";
+		} else if (dm.widthPixels == 320) {
+			screenSize = "ldpi";
+		}
+		
+		//Log.e("res", "w: " + width + " h: " + height);		
 		
 		android.widget.FrameLayout.LayoutParams params = new android.widget.FrameLayout.LayoutParams(width, height);
 		preview.setLayoutParams(params);
-		
-		ImageView ringImageOverlay = (ImageView) findViewById(R.id.ringImageOverlay);
-		ringImageOverlay.setLayoutParams(params);
 	}
-
+	
 	@Override
 	protected void onResume() {
 		super.onResume();
 		camera = Camera.open();
+		camera.setDisplayOrientation(90);
 	}
 
 	@Override
@@ -135,12 +133,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 			camera.setDisplayOrientation(90);
 			lp.height = previewSurfaceHeight;
 			lp.width = (int) (previewSurfaceHeight / aspect);
-			;
 		} else {
 			camera.setDisplayOrientation(0);
 			lp.width = previewSurfaceWidth;
 			lp.height = (int) (previewSurfaceWidth / aspect);
 		}
+		
 
 		preview.setLayoutParams(lp);
 		camera.startPreview();
@@ -177,12 +175,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 		} catch (Exception e) {
 		}
 
-//		Drawable image = null;
-//		Bitmap bitmap = BitmapFactory.decodeByteArray(paramArrayOfByte, 0, paramArrayOfByte.length);
-//		image =  new BitmapDrawable(getResources(), bitmap);
-//		startPreview(image);
-		//paramCamera.startPreview();
-//		Log.e("asdasd", "" + paramArrayOfByte);
 	}
 
 	@Override
@@ -196,24 +188,16 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 	public void onPreviewFrame(byte[] paramArrayOfByte, Camera paramCamera) {
 		
 	}
-	
-//	public void startPreview(Drawable drawable) {
-//		
-//		MyDrawable details = new MyDrawable(drawable);
-//		Intent i = new Intent(this, Preview.class);
-//		i.putExtra("Image", details);
-//		startActivity(i);	
-//	}
-	
+		
 	public void startPreview(String drawable) {
 		
 		Intent i = new Intent(this, Preview.class);
 		i.putExtra("Image", drawable);
-		startActivity(i);	
+		startActivityForResult(i, 0);	
 	}
 	
-	public static float getScale(){
-		return scale;
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, final Intent data) {
+		if (resultCode == 0) finish();
 	}
-
 }

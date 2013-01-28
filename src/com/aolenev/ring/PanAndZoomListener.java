@@ -28,6 +28,8 @@ public class PanAndZoomListener implements OnTouchListener {
 	float				oldDist		= 1f;
 	ImageView			ringImageOverlay;
 	public static float		finalScale	= 1.0f;
+	
+	
 
 	public PanAndZoomListener(ImageView ringImageOverlay) {
 		this.ringImageOverlay = ringImageOverlay;
@@ -79,8 +81,7 @@ public class PanAndZoomListener implements OnTouchListener {
 		}
 		return true; // indicate event was handled
 	}
-
-	// Determine the space between the first two fingers
+ 
 	private float spacing(MotionEvent event) {
 
 		float x = event.getX(0) - event.getX(1);
@@ -88,9 +89,7 @@ public class PanAndZoomListener implements OnTouchListener {
 		return FloatMath.sqrt(x * x + y * y);
 	}
 
-	// Calculate the mid point of the first two fingers
 	private void midPoint(PointF point, MotionEvent event) {
-		// ...
 		float x = event.getX(0) + event.getX(1);
 		float y = event.getY(0) + event.getY(1);
 		point.set(x / 2, y / 2);
