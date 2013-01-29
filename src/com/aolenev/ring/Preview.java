@@ -13,6 +13,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -54,11 +55,13 @@ public class Preview extends Activity {
 			}
 		});
 		
+		Bitmap bitmap = ((BitmapDrawable)getResources().getDrawable(R.drawable.ringh)).getBitmap();		
 		RelativeLayout myLayout = (RelativeLayout) findViewById(R.id.previewRelativeLayout);
-		myLayout.setOnTouchListener(new PanAndZoomListener(ringImageOverlay));
+		final PanAndZoomListener listener = new PanAndZoomListener(ringImageOverlay, bitmap);
+		myLayout.setOnTouchListener(listener);
 		
 		android.widget.RelativeLayout.LayoutParams params = new android.widget.RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-		if (screenS == 0)params.setMargins(120, 255, 0, 0);
+		if (screenS == 0)params.setMargins(123, 255, 0, 0);
 		else params.setMargins(92, 165, 0, 0);
 		ringImageOverlay.setLayoutParams(params);		
 
@@ -86,6 +89,8 @@ public class Preview extends Activity {
 			@Override
 			public void onClick(View v) {
 				setResult(1);
+				File file = new File(filePath);
+				file.delete();
 				finish();				
 			}
 		});
@@ -98,28 +103,48 @@ public class Preview extends Activity {
 				float scale = PanAndZoomListener.finalScale;
 				float rotation = PanAndZoomListener.rotation;
 				matrix.postScale(scale, scale);
-				matrix.postRotate(rotation);			
-				if (screenS == 0) saveFile(photoViewed, Bitmap.createBitmap(ring, 0, 0, ring.getWidth(), ring.getHeight(), matrix, true), filePath, 120, 255);
-				else saveFile(photoViewed, Bitmap.createBitmap(ring, 0, 0, ring.getWidth(), ring.getHeight(), matrix, true), filePath, 92, 165);
-				setResult(0);
-				finish();
+				matrix.postRotate(rotation);	
+				Bitmap result;
+				Log.e("", "" + ringImageOverlay.getImageMatrix());
+				if (screenS == 0) { 
+					Bitmap temp = Bitmap.createBitmap(ring, 0, 0, ring.getWidth(), ring.getHeight(), ringImageOverlay.getImageMatrix(), true);
+					result = overlay(photoViewed, temp, 123 - (temp.getWidth() - ring.getWidth()) / 2, 255 - (temp.getHeight() - ring.getHeight()) / 2);
+					//saveFile(result, filePath);
+				}
+				else { 
+					Bitmap temp = Bitmap.createBitmap(ring, 0, 0, ring.getWidth(), ring.getHeight(), ringImageOverlay.getImageMatrix(), true);
+					result = overlay(photoViewed, temp, 92 - (temp.getWidth() - ring.getWidth() / 2), 165 - (temp.getHeight() - ring.getHeight()) / 2);
+					//saveFile(result, filePath);
+				}
+				listener.clearRingOverlay();
+				Drawable resultDrawable = new BitmapDrawable(getResources(), result);
+				//resultDrawable.setColorFilter(getResources().getColor(R.color.lightBlue), PorterDuff.Mode.MULTIPLY);
+				//imageView.setImageBitmap(result);
+				imageView.setImageDrawable(resultDrawable);
+				
+				//setResult(0);
+				//finish();
 			}
 		});
 	}
 	
-	private void saveFile(Bitmap photo, Bitmap ring, String filePath, float x, float y) {		
-		final Bitmap result = overlay(photo, ring, x, y);
-		
-		try {
-			File file = new File(filePath);
+	public void saveFile(final Bitmap result, final String filePath) {		
+		new Thread(new Runnable() {
 			
-			FileOutputStream os = new FileOutputStream(file);
-			result.compress(Bitmap.CompressFormat.PNG, 100, os);
-			//os.write(rtesultPhoto);
-			//os.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}		
+			@Override
+			public void run() {
+				try {
+					File file = new File(filePath);
+					
+					FileOutputStream os = new FileOutputStream(file);
+					result.compress(Bitmap.CompressFormat.PNG, 100, os);
+					//os.write(rtesultPhoto);
+					//os.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}				
+			}
+		}).start();
 	}
 	
 //	private Drawable resize(Drawable image) {
@@ -148,12 +173,13 @@ public class Preview extends Activity {
 		Bitmap bitmapOrig = Bitmap.createScaledBitmap(d, imageWidth.intValue(), imageHeight.intValue(), false);
 		return new BitmapDrawable(context.getResources(), bitmapOrig);
 	}
-	
+
 	private Bitmap overlay(Bitmap bmp1, Bitmap bmp2, float x, float y) {
-	        Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
-	        Canvas canvas = new Canvas(bmOverlay);
-	        canvas.drawBitmap(bmp1, new Matrix(), null);
-	        canvas.drawBitmap(bmp2, x, y, null);
-	        return bmOverlay;
-	    }
+		Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
+		Canvas canvas = new Canvas(bmOverlay);
+		canvas.drawBitmap(bmp1, new Matrix(), null);
+		canvas.drawBitmap(bmp2, x, y, null);
+		return bmOverlay;
+	}
 }
+

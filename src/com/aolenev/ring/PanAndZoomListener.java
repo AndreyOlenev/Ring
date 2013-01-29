@@ -1,7 +1,8 @@
 package com.aolenev.ring;
 
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.graphics.PointF;
-import android.util.FloatMath;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,22 +18,24 @@ public class PanAndZoomListener implements OnTouchListener {
 	}
 
 	// We can be in one of these 3 states
-	static final int		NONE		= 0;
-	static final int		DRAG		= 1;
-	static final int		ZOOM		= 2;
-	int				mode		= NONE;
+	static final int	NONE		= 0;
+	static final int	DRAG		= 1;
+	static final int	ZOOM		= 2;
+	int			mode		= NONE;
 	// Remember some things for zooming
-	PointF				start		= new PointF();
-	PointF				mid		= new PointF();
-	static float			rotation	= 0;
-	float				oldDist		= 1f;
-	ImageView			ringImageOverlay;
-	public static float		finalScale	= 1.0f;
-	
-	
+	PointF			start		= new PointF();
+	PointF			mid		= new PointF();
+	static float		rotation	= 1;
+	float			oldDist		= 1f;
+	ImageView		ringImageOverlay;
+	public static float	finalScale	= 1.0f;
+	Matrix			matrix		= new Matrix();
+	float			oldScale	= 1.0f;
+	Bitmap			ringBitmap;
 
-	public PanAndZoomListener(ImageView ringImageOverlay) {
+	public PanAndZoomListener(ImageView ringImageOverlay, Bitmap ringBitmap) {
 		this.ringImageOverlay = ringImageOverlay;
+		this.ringBitmap = ringBitmap;
 	}
 
 	public boolean onTouch(View view, MotionEvent event) {
@@ -56,43 +59,53 @@ public class PanAndZoomListener implements OnTouchListener {
 				break;
 			case MotionEvent.ACTION_MOVE:
 				if (mode == DRAG) {
-					rotation += (event.getX() - start.x) / 200.0f;
+					float tempRotation = (event.getX() - start.x) / 200.0f;
+					rotation += tempRotation;
+					Log.e("rotation", "" + rotation);
+					//matrix.postScale(scale, scale);
+					//Log.e("rotation", "rot: " + rotation);
+					//matrix.postRotate(tempRotation, ringImageOverlay.getWidth() / 2, ringImageOverlay.getHeight() / 2);
+					//Bitmap scaledBitmap = Bitmap.createBitmap(ringBitmap, 0, 0, ringBitmap.getWidth(), ringBitmap.getHeight(), matrix, true);
+					//ringImageOverlay.setImageBitmap(scaledBitmap);
+					//ringImageOverlay.setImageMatrix(matrix);
 					ringImageOverlay.setRotation(rotation);
 				} else if (mode == ZOOM) {
 					float newDist = spacing(event);
 					if (newDist > 10f) {
-						final float scale = newDist / oldDist;
-						final float oldScale = ringImageOverlay.getScaleX() - 1;
+						final float scale = (newDist / oldDist) - 1;
 						finalScale = scale + oldScale;
 						oldDist = newDist;
-						Log.e("scale", "" + scale);
-						ringImageOverlay.post(new Runnable() {
-
-							@Override
-							public void run() {
-								ringImageOverlay.setScaleX(scale + oldScale);
-								ringImageOverlay.setScaleY(scale + oldScale);
-
-							}
-						});
+						oldScale = finalScale;
+						//Log.e("scale", "" + finalScale);
+						//matrix.setScale(finalScale, finalScale);
+						//matrix.postRotate(rotation, ringImageOverlay.getWidth() / 2, ringImageOverlay.getHeight() / 2);
+						//Bitmap scaledBitmap = Bitmap.createBitmap(ringBitmap, 0, 0, ringBitmap.getWidth(), ringBitmap.getHeight(), matrix, true);
+						//ringImageOverlay.setImageBitmap(scaledBitmap);
+						//ringImageOverlay.setImageMatrix(matrix);
+						ringImageOverlay.setScaleX(finalScale);
+						ringImageOverlay.setScaleY(finalScale);
 					}
 				}
 				break;
 		}
-		return true; // indicate event was handled
+		return true;
 	}
- 
+
 	private float spacing(MotionEvent event) {
 
 		float x = event.getX(0) - event.getX(1);
 		float y = event.getY(0) - event.getY(1);
-		return FloatMath.sqrt(x * x + y * y);
+		return (float) Math.sqrt(x * x + y * y);
 	}
 
 	private void midPoint(PointF point, MotionEvent event) {
 		float x = event.getX(0) + event.getX(1);
 		float y = event.getY(0) + event.getY(1);
 		point.set(x / 2, y / 2);
+	}
+	
+	public void clearRingOverlay(){
+		this.ringImageOverlay.setImageDrawable(null);
 	}
 
 }

@@ -4,27 +4,24 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="#000000" >
-    
+
     <SurfaceView
         android:id="@+id/mySurfaceView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
     </SurfaceView>
-    
-    <Button
+
+    <ImageButton
         android:id="@+id/shotButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
-        android:layout_marginBottom="15dp"
-        android:text="Shot" >
+        android:layout_marginBottom="13dp"
+        android:background="@drawable/take_photo" />
 
-    </Button>
-    
     <ImageView
         android:id="@+id/handOverlay"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
-    
 
 </FrameLayout>

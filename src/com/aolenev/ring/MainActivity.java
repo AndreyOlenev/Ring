@@ -8,8 +8,6 @@ package com.aolenev.ring;
  * 5. Allows the user to tap "Save" and save the image to their photo library.
  */
 
-//x: 125
-//y: 255
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,6 +15,8 @@ import java.io.IOException;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -26,18 +26,20 @@ import android.hardware.Camera.Size;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.SurfaceView;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 public class MainActivity extends Activity implements SurfaceHolder.Callback, View.OnClickListener, Camera.PictureCallback, Camera.PreviewCallback, Camera.AutoFocusCallback {
 	private Camera		camera;
 	private SurfaceHolder	surfaceHolder;
 	private SurfaceView	preview;
-	private Button		shotBtn;
+	private ImageButton		shotBtn;
 	public static String		screenSize;
 
 	@Override
@@ -58,11 +60,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 
 		surfaceHolder = preview.getHolder();
 		surfaceHolder.addCallback(this);
-		//surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-		
 
-		shotBtn = (Button) findViewById(R.id.shotButton);
-		//shotBtn.setText("Shot");
+		shotBtn = (ImageButton) findViewById(R.id.shotButton);
 		shotBtn.setOnClickListener(this);
 		
 		ImageView handOverlay = (ImageView) findViewById(R.id.handOverlay);
@@ -87,6 +86,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 		
 		android.widget.FrameLayout.LayoutParams params = new android.widget.FrameLayout.LayoutParams(width, height);
 		preview.setLayoutParams(params);
+		showPopup(this);
 	}
 	
 	@Override
@@ -199,5 +199,18 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, final Intent data) {
 		if (resultCode == 0) finish();
+	}
+	
+	private void showPopup(final Activity context) {
+		LinearLayout viewGroup = (LinearLayout) context.findViewById(R.id.popup);
+		LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View layout = layoutInflater.inflate(R.layout.popup_layout, viewGroup);
+
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+		alertDialogBuilder.setView(layout);
+		final AlertDialog alertDialog = alertDialogBuilder.create();
+		//alertDialog.dismiss();
+		alertDialog.show();
+
 	}
 }

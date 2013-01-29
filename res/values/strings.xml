@@ -7,5 +7,7 @@
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="CDPreviewImage">Prewiew Image</string>
+    <string name="popupText1">To try a ring, point the camera at your hand so that it aligns with the outline. Then tap the button to take a photo.</string>
+    <string name="popupText2">Swipe your finger down to change design</string>
 
 </resources>
