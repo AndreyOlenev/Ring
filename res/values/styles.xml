@@ -18,5 +18,6 @@
     </style>
     
     <color name="lightBlue">#9ACEFE</color>
+    <color name="testColor">#234535</color>
 
 </resources>

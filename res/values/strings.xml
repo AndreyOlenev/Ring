@@ -2,12 +2,16 @@
 <resources>
 
     <string name="app_name">Ring</string>
-    <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
-    <string name="CDPreviewImage">Prewiew Image</string>
+    <string name="CDPreviewImage">Prewiew Image.</string>
     <string name="popupText1">To try a ring, point the camera at your hand so that it aligns with the outline. Then tap the button to take a photo.</string>
-    <string name="popupText2">Swipe your finger down to change design</string>
+    <string name="popupText2">Swipe your finger down to change design.</string>
+    <string name="changeRing">change.</string>
+    <string name="CDringImageOverlay">Overlay with static ring image.</string>
+    <string name="CDshotButton">Button to make photo and start prewiew activity.</string>
+    <string name="CDhandOverlay">Set image with stencil hand image.</string>
+    <string name="CDpopupWindowTopLine">Image line on top of popup window.</string>
 
 </resources>

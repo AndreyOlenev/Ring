@@ -39,25 +39,25 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 	private Camera		camera;
 	private SurfaceHolder	surfaceHolder;
 	private SurfaceView	preview;
-	private ImageButton		shotBtn;
-	public static String		screenSize;
+	private ImageButton	shotBtn;
+	public static int	screenWidth;
+	public static int	screenHeight;
+	private String		filePath;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// Portret orientation
+		/** Portret orientation */
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-		// Full Screen
+		/** Full Screen */
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-
 		setContentView(R.layout.activity_main);
-
+		
+		/** camera view */
 		preview = (SurfaceView) findViewById(R.id.mySurfaceView);
-
 		surfaceHolder = preview.getHolder();
 		surfaceHolder.addCallback(this);
 
@@ -68,22 +68,13 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 		final Drawable handImage = getResources().getDrawable(R.drawable.hand1);
 		handOverlay.setImageDrawable(handImage);
 
+		/** calculate and set camera screen resolution */
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
-		
-		//Log.e("start res", "w: " + dm.widthPixels + " h: " + dm.heightPixels);
-		
-		int width = dm.widthPixels;
-		int height = dm.widthPixels * 4 / 3;
-		
-		if (dm.widthPixels == 480){
-			screenSize = "hdpi";
-		} else if (dm.widthPixels == 320) {
-			screenSize = "ldpi";
-		}
-		
-		//Log.e("res", "w: " + width + " h: " + height);		
-		
+		MainActivity.screenWidth = dm.widthPixels;
+		MainActivity.screenHeight = dm.heightPixels;
+		int width = screenWidth;
+		int height = screenWidth * 4 / 3;
 		android.widget.FrameLayout.LayoutParams params = new android.widget.FrameLayout.LayoutParams(width, height);
 		preview.setLayoutParams(params);
 		showPopup(this);
@@ -151,7 +142,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 	@Override
 	public void onClick(View v) {
 		if (v == shotBtn) {
-
+			
+			/** this method take picture or start Autofocus and then take picture */
 			// camera.takePicture(null, null, null, this);
 			camera.autoFocus(this);
 		}
@@ -161,11 +153,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 	public void onPictureTaken(byte[] paramArrayOfByte, Camera paramCamera) {
 		try {
 			File saveDir = new File(Environment.getExternalStorageDirectory().getPath(), "Ring");
-
 			if (!saveDir.exists()) {
 				saveDir.mkdirs();
 			}
-			
 			File file = new File(saveDir, System.currentTimeMillis() + ".jpg");
 			
 			FileOutputStream os = new FileOutputStream(file);
@@ -189,8 +179,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 		
 	}
 		
+	/** Start new Activity to overlay ring */
 	public void startPreview(String drawable) {
-		
+		this.filePath = drawable;
 		Intent i = new Intent(this, Preview.class);
 		i.putExtra("Image", drawable);
 		startActivityForResult(i, 0);	
@@ -198,9 +189,15 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, final Intent data) {
+		/** if user tap save we close aplication. If user tap cancel or click back button we delete photo */
 		if (resultCode == 0) finish();
+		else {
+			File file = new File(this.filePath);
+			file.delete();
+		}
 	}
 	
+	/** start popup window */
 	private void showPopup(final Activity context) {
 		LinearLayout viewGroup = (LinearLayout) context.findViewById(R.id.popup);
 		LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -209,8 +206,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Vi
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 		alertDialogBuilder.setView(layout);
 		final AlertDialog alertDialog = alertDialogBuilder.create();
-		//alertDialog.dismiss();
+		/** 
+		 * if you want remove shadow behind popup Window:
+		 * alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); 
+		 */
 		alertDialog.show();
 
 	}
+	
 }

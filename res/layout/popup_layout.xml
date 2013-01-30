@@ -9,13 +9,14 @@
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:orientation="vertical" >
-    
+
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|center"
         android:layout_marginTop="15dp"
-        android:src="@drawable/line" />
+        android:src="@drawable/line"
+        android:contentDescription="@string/CDpopupWindowTopLine" />
 
     <TextView
         android:id="@+id/popupText1"
@@ -33,10 +34,10 @@
         android:id="@+id/popupText2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:layout_marginTop="20dp"
-        android:layout_marginBottom="15dp"
         android:gravity="center"
         android:text="@string/popupText2"
         android:textAppearance="?android:attr/textAppearanceLarge"

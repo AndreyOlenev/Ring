@@ -17,11 +17,13 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
         android:layout_marginBottom="13dp"
-        android:background="@drawable/take_photo" />
+        android:background="@drawable/take_photo"
+        android:contentDescription="@string/CDshotButton" />
 
     <ImageView
         android:id="@+id/handOverlay"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
+        android:layout_height="fill_parent"
+        android:contentDescription="@string/CDhandOverlay" />
 
 </FrameLayout>
